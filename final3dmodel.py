@@ -61,7 +61,7 @@ CP_SUBSTRATE = 440.0
 CP_SOLDER = 230.0
 CP_CU = 385.0
 
-T_GLASS = 125.0
+T_GLASS = 175.0
 WARNING_T = 110.0
 
 
@@ -249,13 +249,13 @@ def reflow_air_temperature(t, ambient_c, peak_c, heating_time_s):
         return ambient_c + (150.0 - ambient_c) * (x / 0.35)
 
     elif x <= 0.65:
-        return 150.0 + (180.0 - 150.0) * ((x - 0.35) / 0.30)
+        return 150.0 + (170.0 - 150.0) * ((x - 0.35) / 0.30)
 
     elif x <= 0.85:
-        return 180.0 + (peak_c - 180.0) * ((x - 0.65) / 0.20)
+        return 170.0 + (peak_c - 170.0) * ((x - 0.65) / 0.20)
 
     else:
-        return peak_c + (100.0 - peak_c) * ((x - 0.85) / 0.15)
+        return peak_c + (50.0 - peak_c) * ((x - 0.85) / 0.15)
 
 
 def idx(i, j, k, nx, ny, nz):
@@ -547,6 +547,12 @@ def evaluate_thermal_fvm(fvm_result):
     if max_stack > 260.0:
         status = "CRITICAL"
         reason = f"Peak package temperature ({max_stack:.1f}°C) exceeds absolute JEDEC reflow limit (260°C)."
+    elif time_above_tg > 60.0:
+        status = "CRITICAL"
+        reason = f"Time above Tg ({time_above_tg:.1f}s) exceeds absolute JEDEC limit (60s)."
+    elif time_above_tg >= 30.0:
+        status = "WARNING"
+        reason = f"Time above Tg ({time_above_tg:.1f}s) is in the warning zone (30-60s)."
     else:
         status = "STABLE"
         reason = "Thermal reflow profile remains within safe processing limits."
